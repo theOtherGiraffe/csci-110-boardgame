@@ -1,1 +1,147 @@
+#include <iostream>
+#include <string>
+using namespace std;
 
+const int GRID_SIZE = 10;
+char grid[GRID_SIZE][GRID_SIZE] = {
+    {'#','#','#','#','#','#','#','#','#','#'},
+    {'#','S','.','.','.','.','.','C','.','#'},
+    {'#','.','#','#','.','T','.','#','.','#'},
+    {'#','.','.','N','.','.','X','.','.','#'},
+    {'#','.','#','.','#','#','.','#','.','#'},
+    {'#','L','.','.','M','.','.','.','.','#'},
+    {'#','.','#','#','#','.','#','#','.','#'},
+    {'#','.','G','.','.','.','.','.','.','#'},
+    {'#','.','.','.','R','.','.','K','E','#'},
+    {'#','#','#','#','#','#','#','#','#','#'}
+};
+
+int playerX = 1;
+int playerY = 1;
+bool playing = true;
+int credibility = 5;
+
+void displayGrid() {
+    for (int i = 0; i < GRID_SIZE; i++) {
+        for (int j = 0; j < GRID_SIZE; j++) {
+            if (i == playerX && j == playerY)
+                cout << "@ ";
+            else
+                cout << grid[i][j] << ' ';
+        }
+        cout << '\n';
+    }
+    cout << "Credibility: " << credibility << "\n";
+}
+
+void neighborhoodLeaderDialogue() {
+    int choice;
+    cout << "\nYou meet the neighborhood leader.\n";
+    cout << "\"People here need jobs and clean streets. What are you offering?\"\n";
+    cout << "1. 'Green jobs through solar programs.'\n";
+    cout << "2. 'Climate first, economy second.'\n";
+    cout << "3. 'What would *you* want to see?'\n";
+    cout << "Choose: ";
+    cin >> choice;
+    switch(choice) {
+        case 1:
+            cout << "\"That sounds promising. Show me more.\"\n";
+            credibility++;
+            break;
+        case 2:
+            cout << "\"That's not how things work here.\"\n";
+            credibility--;
+            break;
+        case 3:
+            cout << "\"Thank you for listening. We need jobs and safe air.\"\n";
+            credibility += 2;
+            break;
+        default:
+            cout << "\"I'm not sure what you're saying.\"\n";
+    }
+}
+
+void handleCell(char cell) {
+    switch(cell) {
+        case 'C':
+            cout << "You attend a community meeting. You learn what locals care about.\n";
+            credibility++;
+            break;
+        case 'T':
+            cout << "You plant trees, but some neighbors say it's not enough.\n";
+            credibility++;
+            break;
+        case 'N':
+            neighborhoodLeaderDialogue();
+            break;
+        case 'X':
+            cout << "Misinformation is spreading. Your credibility suffers.\n";
+            credibility -= 2;
+            break;
+        case 'L':
+            cout << "You pitch green ideas to a local business. They're interested!\n";
+            credibility++;
+            break;
+        case 'M':
+            cout << "You speak with marginalized voices. They ask for inclusion and fairness.\n";
+            credibility++;
+            break;
+        case 'G':
+            cout << "You apply for a grant. It's approved thanks to your alignment with community values.\n";
+            credibility++;
+            break;
+        case 'R':
+            cout << "You organize a rally. It's peaceful and inspiring.\n";
+            credibility++;
+            break;
+        case 'K':
+            cout << "You learn from elders and youth. Your solutions become more holistic.\n";
+            credibility++;
+            break;
+        case 'E':
+            cout << "You've reached the empowered community! Mission complete.\n";
+            playing = false;
+            break;
+        default:
+            break;
+    }
+}
+
+void movePlayer(char dir) {
+    int newX = playerX, newY = playerY;
+    switch(toupper(dir)) {
+        case 'W': newX--; break;
+        case 'S': newX++; break;
+        case 'A': newY--; break;
+        case 'D': newY++; break;
+        default: return;
+    }
+
+    if (grid[newX][newY] != '#') {
+        playerX = newX;
+        playerY = newY;
+        handleCell(grid[playerX][playerY]);
+    } else {
+        cout << "You can't go that way.\n";
+    }
+}
+
+int main() {
+    char input;
+    cout << "Welcome to the Community Climate Quest!\n";
+    // add control
+    do {
+        displayGrid();
+        cout << "Move with W/A/S/D, Q to quit: ";
+        cin >> input;
+        if (toupper(input) == 'Q') break;
+        movePlayer(input);
+        if (credibility <= 0) {
+            cout << "You've lost credibility and the community no longer supports you.\n";
+            playing = false;
+        }
+    } while (playing);
+
+    cout << "\nThanks for playing!\n";
+    return 0;
+}
